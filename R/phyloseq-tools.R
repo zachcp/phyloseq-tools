@@ -10,19 +10,12 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr %>%
 #' @importFrom dplyr left_join
-#' 
+#' @export
 tax_from_blast <- function(physeq, blasttablefile){
   #some basic data checks
   if (!c('otu_table') %in% getslots.phyloseq(physeq)){
     stop("Phyloseq object must have an otu_table to import a blast taxonomy")
   }
-  
-  #import biotables
-  if(!require("biotables")){
-    devtools::install_github('zachcp/biotables')
-    library("biotables")
-  }
-  
   #load taxonomy file
   blast <- load_blast(blasttablefile)
   blast <- blast %>% select(query, target, percent_ident, length, evalue, bitscore)
@@ -35,60 +28,68 @@ tax_from_blast <- function(physeq, blasttablefile){
   blasttax <- left_join(otus,blast) %>%
     as.matrix()
   rownames(blasttax) <- blasttax$query
-    
   return(blasttax)
 }
-
-
-
-library(dplyr)
-library(magrittr)
-library(stringr)
-library(lazyeval)
-library(ape)
-
+#'
+#' Get the  unique values from a column and return a simple phylogenetic tree 
+#' 
+#' This function is intened for use with a dataframe of sluter information where
+#' each row is a sequence/OTU and each column is a level of similariy (percent identity)
+#' this function will return a tree based on the lowest percent identity column and
+#' we will build off of it.
+#' @importFrom stringr str_c
+#' @importFrom ape read.tree
 column_to_tree <- function(df, colname){
-  #get unique names
+  #get unique names, make newick string and tree
   concatnames <- unique(df[[colname]]) %>% str_c(collapse=",")
-  
-  #make a simple newick
   tree = paste("(", concatnames,");")
-  
-  #creatae a tree
   read.tree(text=tree)
 }
-
-
-add_to_tree <- function(df, tree, lowidcol, highidcol, val){
-  # get values from the lowidcol where the highidcol is val
-  # add those to the tree at the val position
-  newvals <- df[df[[lowidcol]] == val,][[highidcol]]
-  #concat the vals and make a tree
-  concatnames <- str_c(unique(newvals),collapse=",")
-  newtree = read.tree( text= paste("(", concatnames,");"))
-  tree = bind.tree(tree,newtree, where=which(tree$tip.label==val))
+#'
+#' add a tree to a base tree at tipname
+#' 
+#' @importFrom ape bind.tree
+#' @return phylo object
+add_tree_at_tip <-function(basetree, incomingtree, tipname){
+  bind.tree(basetree, incomingtree, where=which(basetree$tip.label==tipname))
 }
-
-df <- data.frame( otu1=c('a','b','c','d','e','f','g','h','i','j','k'), 
-                  otu2=c('a','a','c','c','e','e','g','e','i','g','i'),
-                  otu3=c('a','a','a','a','e','e','e','e','i','i','i'),
-                  stringsAsFactors = FALSE)
-
-
-#base tree of otu3
-basetree <- column_to_tree(df, "otu3")
-
-#otu3 to otu2
-t <- add_to_tree(df,basetree,"otu3","otu2","a")
-t <- add_to_tree(df,t,"otu3","otu2","e")
-t <- add_to_tree(df,t,"otu3","otu2","i")
-
-#otu2 to otu1
-t <- add_to_tree(df,t,"otu2","otu1","a")
-t <- add_to_tree(df,t,"otu2","otu1","c")
-t <- add_to_tree(df,t,"otu2","otu1","e")
-t <- add_to_tree(df,t,"otu2","otu1","g")
-t <- add_to_tree(df,t,"otu2","otu1","i")
-plot(t)
-
-
+#'
+#' get values from adjacent row
+#' 
+#' in a table representing phylogenetic relationships
+#' each column of the table correspods to one more 
+#' level of clustering. this will get the values of
+#' the "higher" column, based on shared rows with the 
+#' "lowercolumn"
+#' 
+#' @return phylo object
+#' @importFrom ape read.tree
+get_next_order_tree <- function(df, lowidcol, highidcol, val){
+  newvals <- df[df[[lowidcol]] == val,][[highidcol]]
+  vals    <- str_c(unique(newvals),collapse=",")
+  tree    <- paste("(", vals,");")
+  return(read.tree(text=tree))
+}
+#'
+#' make a tree from a dataframe
+#' @export
+make_tree <- function(df){
+  numcols <- length(names(df))
+  # use last column for base tree and loop backwards
+  basetree <- column_to_tree(df, numcols) 
+  for (i in c(numcols:1)){
+    #loop through the columns and start with the second column
+    if (i < numcols) {
+      for (val in unique(df[[i+1]])){
+        #get the values for the tree...
+        incomingtree <- get_next_order_tree(df=df, 
+                            lowidcol= i+1,
+                            highidcol= i,
+                            val=val)
+        #...and tack them onto the original tree.
+        basetree <- add_tree_at_tip(basetree,incomingtree,val)
+      }
+    }
+  }
+  return(basetree)  
+}

@@ -1,4 +1,4 @@
-Package: phyloseq-tools
+Package: phyloseq.tools
 Type: Package
 Title: convenience functions for working with phyloseq
 Version: 0.0.1
@@ -10,5 +10,8 @@ License: MIT
 Depends:
     phyloseq
 Imports:
-    dplyr (>= 0.4.0)
-    
+    dplyr (>= 0.4.0),
+    readr,
+    magrittr
+Suggests:
+    testthat
