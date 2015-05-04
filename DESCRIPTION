@@ -11,7 +11,6 @@ Depends:
     phyloseq
 Imports:
     dplyr (>= 0.4.0),
-    readr,
-    magrittr
-Suggests:
-    testthat
+    readr (>= 0.1.0), 
+    magrittr (>= 1.5)
+Suggests: testthat
