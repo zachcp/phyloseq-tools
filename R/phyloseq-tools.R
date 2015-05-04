@@ -50,6 +50,7 @@ column_to_tree <- function(df, colname){
 #' 
 #' @importFrom ape bind.tree
 #' @return phylo object
+#' @keywords internal
 add_tree_at_tip <-function(basetree, incomingtree, tipname){
   bind.tree(basetree, incomingtree, where=which(basetree$tip.label==tipname))
 }
@@ -64,6 +65,7 @@ add_tree_at_tip <-function(basetree, incomingtree, tipname){
 #' 
 #' @return phylo object
 #' @importFrom ape read.tree
+#' @keywords internal
 get_next_order_tree <- function(df, lowidcol, highidcol, val){
   newvals <- df[df[[lowidcol]] == val,][[highidcol]]
   vals    <- str_c(unique(newvals),collapse=",")
