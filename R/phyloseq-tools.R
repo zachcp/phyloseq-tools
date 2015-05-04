@@ -10,6 +10,7 @@
 #' @importFrom dplyr select
 #' @importFrom dplyr %>%
 #' @importFrom dplyr left_join
+#' @importFrom magrittr %<>%
 #' @export
 tax_from_blast <- function(physeq, blasttablefile){
   #some basic data checks
@@ -17,18 +18,30 @@ tax_from_blast <- function(physeq, blasttablefile){
     stop("Phyloseq object must have an otu_table to import a blast taxonomy")
   }
   #load taxonomy file
-  blast <- load_blast(blasttablefile)
-  blast <- blast %>% select(query, target, percent_ident, length, evalue, bitscore)
+  blast <- load_blast(blasttablefile) %>% 
+    select(query, target, percent_ident, length, evalue, bitscore) %>%
+    group_by(query) %>%  
+    top_n(1, wt=bitscore) %>% #keep only the top hits
+    group_by(query) %>%
+    slice(1:1)                #when there are identical top hits take the first
   
   #make a dataframe of otunames
   otus  <- taxa_names(physeq) %>% as.data.frame()
   names(otus) <- c('query')  
   
   #merge the otudata and the blastdata together 
-  blasttax <- left_join(otus,blast) %>%
-    as.matrix()
+  #set NAs on the column appropriate to the column
+  blasttax <- left_join(otus,blast)
+  blasttax$target[is.na(blasttax$target)] <- "No Target"
+  blasttax$percent_ident[is.na(blasttax$percent_ident)] <- 0
+  blasttax$length[is.na(blasttax$length)] <- 0
+  blasttax$evalue[is.na(blasttax$evalue)] <- 1
+  blasttax$bitscore[is.na(blasttax$bitscore)] <- 0
   rownames(blasttax) <- blasttax$query
-  return(blasttax)
+  
+  blasttax %<>% select(-query) %>% as.matrix()
+  tax_table(physeq) <- blasttax
+  return(physeq)
 }
 #'
 #' Get the  unique values from a column and return a simple phylogenetic tree 
