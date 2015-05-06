@@ -1,7 +1,7 @@
 Package: phyloseq.tools
 Type: Package
 Title: convenience functions for working with phyloseq
-Version: 0.0.1
+Version: 0.0.2
 Date: 2015-04-23
 Author: zach charlop-powers
 Maintainer: zach charlop-powers <zcharlop@rockefeller.edu>
@@ -14,5 +14,4 @@ Imports:
     readr (>= 0.1.0), 
     magrittr (>= 1.5),
     stringr (>= 1.0.0)
-    
 Suggests: testthat
