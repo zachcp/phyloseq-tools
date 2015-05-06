@@ -10,15 +10,17 @@
 #'    `query target percent_ident length mismatch gapopen 
 #'     qstart qend sstart send evalue bitscore'
 #'   
-#' @importFrom readr read_delim
+#' @importFrom readr read_tsv
 #' @export
 #' @seealso
 #' \href{http://www.ncbi.nlm.nih.gov/books/NBK279675/}{The Blast Book}
 #' 
 load_blast <- function(filename){
   blasttable <- read_tsv(file = filename, 
-                         col_names = c('query', 'target', 'percent_ident', 'length', 'mismatch', 'gapopen',
-                                       'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore'))
+                         col_names = c('query', 'target', 'percent_ident', 
+                                       'length', 'mismatch', 'gapopen', 
+                                       'qstart', 'qend', 'sstart', 'send', 
+                                       'evalue', 'bitscore'))
 }
 
 #'
