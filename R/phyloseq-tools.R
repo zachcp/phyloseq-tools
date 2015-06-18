@@ -5,6 +5,10 @@
 #' trick. This funciton allows you to import your blast results as a taxonomic
 #' table. In this case the 'query' and 'target' corresponds with would be your
 #' OTU name and taxon. 
+
+#' @param physeq
+#' @param blasttablefile
+#' @param cutoff 
 #' 
 #' @import phyloseq
 #' @importFrom dplyr select
@@ -12,7 +16,7 @@
 #' @importFrom dplyr left_join
 #' @importFrom magrittr %<>%
 #' @export
-tax_from_blast <- function(physeq, blasttablefile){
+tax_from_blast <- function(physeq, blasttablefile, cutoff=NULL){
   #some basic data checks
   if (!c('otu_table') %in% getslots.phyloseq(physeq)){
     stop("Phyloseq object must have an otu_table to import a blast taxonomy")
@@ -24,6 +28,19 @@ tax_from_blast <- function(physeq, blasttablefile){
     top_n(1, wt=bitscore) %>% #keep only the top hits
     group_by(query) %>%
     slice(1:1)                #when there are identical top hits take the first
+  
+  #cutoff results not passing evalue threshold
+  if (!is.null(cutoff)) {
+    if (!is.numeric(cutoff)){
+      stop("teh evalue cutoff must be numeric")
+    }
+    blast %<>% filter(evalue <= cutoff)
+  }
+  
+  #check the length of the blast table
+  blastdf_dimensions = dim(as.data.frame(blast))
+  if (blastdf_dimensions[0] == 0) stop("Empty Blast Dataframe. check the cutoff values")
+  
   
   #make a dataframe of otunames
   otus  <- taxa_names(physeq) %>% as.data.frame()
