@@ -32,9 +32,9 @@ tax_from_blast <- function(physeq, blasttablefile, cutoff=NULL){
   #cutoff results not passing evalue threshold
   if (!is.null(cutoff)) {
     if (!is.numeric(cutoff)){
-      stop("teh evalue cutoff must be numeric")
+      stop("the evalue cutoff must be numeric")
     }
-    blast %<>% filter(evalue <= cutoff)
+    blast <- blast %>% filter(evalue <= cutoff)
   }
   
   #check the length of the blast table
