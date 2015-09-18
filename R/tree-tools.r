@@ -16,6 +16,7 @@
 #' @param size size of circles
 #' @param abundancescale a sclae for circle size
 #' @param method
+#' @param legend
 interactivetree <- function(physeq,
                             ladderize=TRUE,
                             aspectratio=1,
