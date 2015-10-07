@@ -61,6 +61,26 @@ tax_from_blast <- function(physeq, blasttablefile, cutoff=NULL){
   return(physeq)
 }
 
+#' Merge Taxa Based on UC file Clustering
+#'
+#' @importFrom dplyr %>%
+mergeTaxaUC <- function(phy, ucfile){
+  phy2 <- phy
+  ucdata <- load_uc(ucfile)
+  ucdata <- ucdata %>% filter(rectype == "H") %>% select(query, target)
+  
+  splits <- split(ucdata, ucdata$target)
+  
+  for (df in splits){
+    target = unique(df$target)
+    queries = df$query
+    print("Merge Ahoy!")
+    print(c(target,queries))
+    phy2 <- merge_taxa(phy2, eqtaxa = c(target,queries), archetype = 1)
+  }
+  return(phy2)
+}
+
 #' Calculate Rarefaction Curves
 #'
 #' Generate Rarefaction Curves from Phyloseq.
