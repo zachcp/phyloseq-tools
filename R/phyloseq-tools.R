@@ -61,23 +61,48 @@ tax_from_blast <- function(physeq, blasttablefile, cutoff=NULL){
   return(physeq)
 }
 
+# #' Merge Taxa Based on UC file Clustering
+# #'
+# #' @importFrom dplyr %>%
+# mergeTaxaUC <- function(phy, ucfile){
+#   phy2 <- phy
+#   ucdata <- load_uc(ucfile)
+#   ucdata <- ucdata %>% filter(rectype == "H") %>% select(query, target)
+#   
+#   splits <- split(ucdata, ucdata$target)
+#   
+#   for (df in splits){
+#     target = unique(df$target)
+#     queries = df$query
+#     print("Merge Ahoy!")
+#     print(c(target,queries))
+#     phy2 <- merge_taxa(phy2, eqtaxa = c(target,queries), archetype = 1)
+#   }
+#   return(phy2)
+# }
+
 #' Merge Taxa Based on UC file Clustering
-#'
+#' uses devtools::install_github("zachcp/phyloseq", ref="tax_glom_speedup")
 #' @importFrom dplyr %>%
 mergeTaxaUC <- function(phy, ucfile){
   phy2 <- phy
   ucdata <- load_uc(ucfile)
-  ucdata <- ucdata %>% filter(rectype == "H") %>% select(query, target)
   
-  splits <- split(ucdata, ucdata$target)
+  #process UCdata
+  ucdata2 <- ucdata %>% 
+    select(query, target) %>% 
+    mutate(target = ifelse(target=="*",query,target)) %>%
+    group_by(query, target) %>%
+    summarise(n=n())
+  #add rows and make colum
+  row.names(ucdata2) <- ucdata2$query  
+  ucdata2 <- ucdata2 %>% 
+    select(-query) %>%
+    as.matrix()
   
-  for (df in splits){
-    target = unique(df$target)
-    queries = df$query
-    print("Merge Ahoy!")
-    print(c(target,queries))
-    phy2 <- merge_taxa(phy2, eqtaxa = c(target,queries), archetype = 1)
-  }
+  #add to physeq
+  tax_table(phy2) <- tax_table(ucdata2)
+  
   return(phy2)
 }
 
@@ -148,3 +173,47 @@ calculate_rarefaction_curves <- function(physeq, measures, depths, parallel=FALS
                                                   by.y = 'row.names')
   return(rarefaction_curve_data_summary_verbose)
 }
+
+
+process_df <- function(df) {
+  name <- rownames(df)[[1]]
+  sums <- colSums(df)
+
+  rownames(sums) <- name
+  return(df)
+}
+
+my.df <- data.frame(a = runif(10),
+                    b = runif(10),
+                    c = runif(10),
+                    d = runif(10))
+
+my.df$e <- c(1,1,1,2,2,2,3,3,3,4)
+
+condense_df <- function(name, dflist, splitcol = NULL){
+  df = dflist[[name]]
+  print(df)
+  df = colSums(df)
+  return(df)
+}
+
+condenseOTUs_by_UC <- function(otutable, splitcol) {
+  splits <- split(otutable, otutable[[splitcol]])
+  summed <- Map(colSums, splits)
+  summeddf <- Reduce(rbind, summed, init = NULL)
+  rownames(summeddf) <- unique(otutable[[splitcol]])
+  summeddf[, !colnames(summeddf) %in% c(splitcol)]
+}
+x <- condenseOTUs_by_UC(my.df, splitcol="e")
+print(x)
+
+
+#split on col e
+splits <- split(my.df, my.df$e)
+
+lapply(names(splits), function(x){condense_df(name=x,dflist=splits,splitcol="e")})
+
+lapply(l1, print(l1$name))
+sapply(split(my.df, my.df$e), process_df)
+
+

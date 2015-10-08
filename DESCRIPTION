@@ -1,14 +1,14 @@
 Package: phyloseq.tools
 Type: Package
 Title: convenience functions for working with phyloseq
-Version: 0.1.0
+Version: 0.1.1
 Date: 2015-04-23
 Author: zach charlop-powers
 Maintainer: zach charlop-powers <zcharlop@rockefeller.edu>
 Description: convenience functions for working with phyloseq
 License: MIT
 Depends:
-    phyloseq
+    phyloseq (1.13)
 Imports:
     dplyr (>= 0.4.0),
     readr (>= 0.1.0), 
