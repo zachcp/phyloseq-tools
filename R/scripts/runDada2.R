@@ -1,11 +1,7 @@
 #!/usr/bin/env Rscript
 library(docopt)
 
-"Usage: runDaDa2.R --forwardReadpath FILE --reverseReadpath FILE --samplename SAMPLENAME 
-                    [--outdir=<outdir>] [--trimLeftf=<trimf>] [--trimLeftr=<trimr>]
-                    [--truncLenf=<trunf>] [--truncLenr=<trunr>] [--savetrimmed=<savetrimmed>]
-                    [--saveDADA2=<savadada>] [--minfilesize=<minfilesize>] [--justConcatenate=<justconcat>
-                    [--merge=<merge> ]
+"Usage: runDada2.R [options]
 
 Description:   Run DADA2 on a Forward/Reverse fastq pair
 Options:
@@ -40,11 +36,8 @@ saveDADA2       <- ifelse(opts[['--saveDADA2']] == "TRUE", TRUE, FALSE)
 justConcatenate <- ifelse(opts[['--savetrimmed']] == "TRUE", TRUE, FALSE)
 merge           <- ifelse(opts[['--saveDADA2']] == "TRUE", TRUE, FALSE)
 
-
 library(dplyr)
 library(dada2)
-
-
 
 readPathsToDada2 <- function(forwardReadpath, 
                              reverseReadpath, 
@@ -60,8 +53,8 @@ readPathsToDada2 <- function(forwardReadpath,
                              justConcatenate = TRUE,
                              merge=TRUE) {
   
-  fqf_trimmed <- paste0(samplename, "_F_filt_", truncLenf, ".fastq") 
-  fqr_trimmed <- paste0(samplename, "_R_filt_", truncLenr, ".fastq") 
+  fqf_trimmed <- paste0(outdir,"/",samplename, "_F_filt_", truncLenf, ".fastq") 
+  fqr_trimmed <- paste0(outdir,"/",samplename, "_R_filt_", truncLenr, ".fastq") 
   print(paste("Tempfiles: ", fqf_trimmed, fqr_trimmed))
   
   #' trim files
