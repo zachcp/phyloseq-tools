@@ -1,7 +1,8 @@
 #!/usr/bin/env Rscript
 library(docopt)
 
-"Usage: runDada2.R [options]
+"Usage: 
+  runDada2.R [options]
 
 Description:   Run DADA2 on a Forward/Reverse fastq pair
 Options:
@@ -22,19 +23,21 @@ Options:
 opts <- docopt(doc)
 
 # check opts
-fqf             <- as.character( opts[["--forwardReadpath"]] )
-fqr             <- as.character( opts[["--reverseReadpath"]] )
-samplename      <- as.character( opts[["--samplename"]] )
-outdir          <- as.character( opts[["--outdir"]] )
-trimLeftf       <- as.numeric(opts[['--trimLeftf']])
-trimLeftr       <- as.numeric(opts[['--trimLeftr']])
-truncLenf       <- as.numeric(opts[['--truncLenf']])
-truncLenr       <- as.numeric(opts[['--truncLenr']])
-minfilesize     <- as.numeric(opts[['--minfilesize']])
-savetrimmed     <- ifelse(opts[['--savetrimmed']] == "TRUE", TRUE, FALSE)
-saveDADA2       <- ifelse(opts[['--saveDADA2']] == "TRUE", TRUE, FALSE)
-justConcatenate <- ifelse(opts[['--savetrimmed']] == "TRUE", TRUE, FALSE)
-merge           <- ifelse(opts[['--saveDADA2']] == "TRUE", TRUE, FALSE)
+fqf             <- opts$forwardReadpath
+fqr             <- opts$reverseReadpath
+samplename      <- opts$samplename
+outdir          <- opts$outdir
+trimLeftf       <- as.numeric(opts$trimLeftf)
+trimLeftr       <- as.numeric(opts$trimLeftr)
+truncLenf       <- as.numeric(opts$truncLenf)
+truncLenr       <- as.numeric(opts$truncLenr)
+minfilesize     <- as.numeric(opts$minfilesize)
+savetrimmed     <- ifelse(opts$savetrimmed == "TRUE", TRUE, FALSE)
+saveDADA2       <- ifelse(opts$saveDADA2 == "TRUE", TRUE, FALSE)
+justConcatenate <- ifelse(opts$savetrimmed == "TRUE", TRUE, FALSE)
+merge           <- ifelse(opts$saveDADA2 == "TRUE", TRUE, FALSE)
+
+print(fqf)
 
 library(dplyr)
 library(dada2)
