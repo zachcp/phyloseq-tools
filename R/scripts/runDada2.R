@@ -58,6 +58,10 @@ readPathsToDada2 <- function(forwardReadpath,
                              justConcatenate = TRUE,
                              merge=TRUE) {
   
+  # deal with unpredicatable multithreading
+  nthreads <- .Call(ShortRead:::.set_omp_threads, 1L)
+  on.exit(.Call(ShortRead:::.set_omp_threads, nthreads))
+  
   fqf_trimmed <- paste0(outdir,"/",samplename, "_F_filt_", truncLenf, ".fastq") 
   fqr_trimmed <- paste0(outdir,"/",samplename, "_R_filt_", truncLenr, ".fastq") 
   print(paste("Tempfiles: ", fqf_trimmed, fqr_trimmed))
