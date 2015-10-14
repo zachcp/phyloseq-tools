@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
-library(docopt)
+
+suppressPackageStartupMessages(library(docopt))
 
 "Usage: 
   runDada2.R [options]
@@ -39,8 +40,9 @@ merge           <- ifelse(opts$saveDADA2 == "TRUE", TRUE, FALSE)
 
 print(fqf)
 
-library(dplyr)
-library(dada2)
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(dada2))
+
 
 readPathsToDada2 <- function(forwardReadpath, 
                              reverseReadpath, 
