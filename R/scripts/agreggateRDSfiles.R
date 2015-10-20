@@ -15,6 +15,7 @@ opts <- docopt(doc)
 
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(dada2))
+suppressPackageStartupMessages(library(phyloseq))
 suppressPackageStartupMessages(library(stringr))
 
 #' Write FNA from Seqfiles
