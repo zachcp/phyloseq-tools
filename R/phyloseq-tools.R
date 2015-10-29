@@ -208,12 +208,4 @@ x <- condenseOTUs_by_UC(my.df, splitcol="e")
 print(x)
 
 
-#split on col e
-splits <- split(my.df, my.df$e)
-
-lapply(names(splits), function(x){condense_df(name=x,dflist=splits,splitcol="e")})
-
-lapply(l1, print(l1$name))
-sapply(split(my.df, my.df$e), process_df)
-
 
