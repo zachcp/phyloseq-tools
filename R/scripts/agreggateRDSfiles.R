@@ -17,58 +17,13 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(dada2))
 suppressPackageStartupMessages(library(phyloseq))
 suppressPackageStartupMessages(library(stringr))
-
-#' Write FNA from Seqfiles
-#'
-write_FNA <- function(seqtable, outfile){
-  FIRST = TRUE
-  seqs <- colnames(seqtable)
-  for (i in seq_along(seqs)) {
-    if (i == 2)  FIRST = FALSE
-    
-    outdata = paste0(">Seq_", stringr::str_pad(i, 7, pad=0),"\n", seqs[[i]], "\n")
-    if (FIRST == TRUE) {
-      write(outdata,file = outfile, sep="", append = FALSE)
-    } else {
-      write(outdata,file = outfile, sep="", append = TRUE)
-    } 
-    
-  }
-  print(paste0("All records are printed to fastafile ", outfile))
-}
-
-#' Combine RDS files
-#'
-combineRDSfiles <- function(rdslist, otutableout, phyloseqoutfile, FNAoutfile) {
-  # load everything into a phylsoeq object
-  seqtab <- makeSequenceTable(rdslist)
-  #seqs <- colnames(seqtab)
-  otab <- otu_table(seqtab, taxa_are_rows=FALSE)
-  colnames(otab) <- paste0("Seq", seq(ncol(otab)))
-  taxtab <- tax_table(matrix(colnames(otab), ncol=1))
-  rownames(taxtab) <- colnames(otab)
-  colnames(taxtab) <- "Sequence"
-  ps <- phyloseq(otab, taxtab)
-  
-  # save the phyloseq object
-  saveRDS(ps, file=phyloseqoutfile)
-  print(paste0("Saved phyloseq object as ", phyloseqoutfile ))
-  
-  # save OTUfile
-  write.table(otab, file = otutableout)
-  print(paste0("Saved otutable as ", otutableout ))
-  
-  # save the FNA file of sequences
-  write_FNA(seqtab, outfile = FNAoutfile)
-}
-
+suppressPackageStartupMessages(library(phyloseq.tools))
 
 # check opts
 datapath       <- opts$datapath
 experimentname <- opts$experimentname
 outdir         <- opts$outdir
 
-#datapath = "/data/DFD/data/"
 RDSfiles <- list.files(datapath)
 RDSnames <- as.character(lapply(RDSfiles, function(x) return(strsplit(x, "_")[[1]][1])))
 RDSdata <- lapply(RDSfiles, function(x) readRDS(paste0(datapath,x)))
