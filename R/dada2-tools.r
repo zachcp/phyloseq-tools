@@ -37,7 +37,7 @@ write_FNA <- function(seqtable, outfile){
 #' @param FNAoutfile outpupt file for the sequences.
 #' 
 #' @importFrom dada2 makeSequenceTable
-#' 
+#' @export
 combineRDSfiles <- function(dadalist, otutableout, phyloseqoutfile, FNAoutfile) {
   # load everything into a phyloseq object
   seqtab <- makeSequenceTable(dadalist)

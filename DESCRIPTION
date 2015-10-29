@@ -11,11 +11,12 @@ Depends:
     phyloseq (>= 1.13)
 Imports:
     dplyr (>= 0.4.0),
-    readr (>= 0.2.0), 
+    readr (>= 0.2.0),
     magrittr (>= 1.5),
     stringr (>= 1.0.0),
-    leaflet (>= 1.0.0),
-Suggests: 
-  testthat,
-  foreach,
-  doParallel
+    leaflet (>= 1.0.0)
+Suggests:
+    testthat,
+    foreach,
+    doParallel
+RoxygenNote: 5.0.0
