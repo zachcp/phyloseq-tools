@@ -8,7 +8,7 @@ Maintainer: zach charlop-powers <zcharlop@rockefeller.edu>
 Description: convenience functions for working with phyloseq
 License: MIT
 Depends:
-    phyloseq (>=1.13)
+    phyloseq (>= 1.13)
 Imports:
     dplyr (>= 0.4.0),
     readr (>= 0.2.0), 
