@@ -37,13 +37,15 @@ write_FNA <- function(seqtable, outfile){
 #' @param FNAoutfile outpupt file for the sequences.
 #' 
 #' @importFrom dada2 makeSequenceTable
+#' @importFrom stringr str_pad
 #' @export
 combineRDSfiles <- function(dadalist, otutableout, phyloseqoutfile, FNAoutfile) {
   # load everything into a phyloseq object
   seqtab <- makeSequenceTable(dadalist)
   #seqs <- colnames(seqtab)
   otab <- otu_table(seqtab, taxa_are_rows=FALSE)
-  colnames(otab) <- paste0("Seq_", seq(ncol(otab)))
+  colnames(otab) <- paste0("Seq_", str_pad(seq(ncol(otab)), 7, pad=0))
+  
   taxtab <- tax_table(matrix(colnames(otab), ncol=1))
   rownames(taxtab) <- colnames(otab)
   colnames(taxtab) <- "Sequence"
