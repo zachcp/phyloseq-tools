@@ -54,7 +54,7 @@ combineRDSfiles <- function(dadalist, otutableout, phyloseqoutfile, FNAoutfile) 
   print(paste0("Saved phyloseq object as ", phyloseqoutfile ))
   
   # save OTUfile
-  write.table(otab, file = otutableout)
+  write.table(otab, file = otutableout, quote=FALSE, sep="\t")
   print(paste0("Saved otutable as ", otutableout ))
   
   # save the FNA file of sequences
