@@ -16,7 +16,7 @@
 #' @importFrom dplyr left_join
 #' @importFrom magrittr %<>%
 #' @export
-tax_from_blast <- function(physeq, blasttablefile, cutoff=NULL){
+tax_from_blast <- function(physeq, blasttablefile, cutoff=NULL, removetrailingchar=TRUE){
   #some basic data checks
   if (!c('otu_table') %in% getslots.phyloseq(physeq)){
     stop("Phyloseq object must have an otu_table to import a blast taxonomy")
@@ -41,9 +41,20 @@ tax_from_blast <- function(physeq, blasttablefile, cutoff=NULL){
   blastdf_dimensions = dim(as.data.frame(blast))
   if (blastdf_dimensions[1] == 0) stop("Empty Blast Dataframe. check the cutoff values")
   
-  
   #make a dataframe of otunames
-  otus  <- taxa_names(physeq) %>% as.data.frame()
+  tnames <- taxa_names(physeq)
+  
+  #check for semicolon chaacter at the end of the taxanames by usearch/uparse
+  if (removetrailingchar == TRUE) {
+    if (all(grepl(";$", tnames))) {
+      tnames <- as.character(lapply(tnames, function(x){strtrim(x, nchar(x) -1)} ))
+    }
+    
+    taxa_names(physeq) <- tnames
+  }
+  
+  
+  otus  <- tnames %>% as.data.frame()
   names(otus) <- c('query')  
   
   #merge the otudata and the blastdata together 
