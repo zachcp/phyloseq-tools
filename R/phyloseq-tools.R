@@ -184,39 +184,3 @@ calculate_rarefaction_curves <- function(physeq, measures, depths, parallel=FALS
                                                   by.y = 'row.names')
   return(rarefaction_curve_data_summary_verbose)
 }
-
-
-process_df <- function(df) {
-  name <- rownames(df)[[1]]
-  sums <- colSums(df)
-
-  rownames(sums) <- name
-  return(df)
-}
-
-my.df <- data.frame(a = runif(10),
-                    b = runif(10),
-                    c = runif(10),
-                    d = runif(10))
-
-my.df$e <- c(1,1,1,2,2,2,3,3,3,4)
-
-condense_df <- function(name, dflist, splitcol = NULL){
-  df = dflist[[name]]
-  print(df)
-  df = colSums(df)
-  return(df)
-}
-
-condenseOTUs_by_UC <- function(otutable, splitcol) {
-  splits <- split(otutable, otutable[[splitcol]])
-  summed <- Map(colSums, splits)
-  summeddf <- Reduce(rbind, summed, init = NULL)
-  rownames(summeddf) <- unique(otutable[[splitcol]])
-  summeddf[, !colnames(summeddf) %in% c(splitcol)]
-}
-x <- condenseOTUs_by_UC(my.df, splitcol="e")
-print(x)
-
-
-
